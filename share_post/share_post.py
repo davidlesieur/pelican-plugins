@@ -7,6 +7,7 @@ online tracking of your readers.
 """
 
 from bs4 import BeautifulSoup
+from markupsafe import Markup
 try:
     from urllib.parse import quote
 except ImportError:
@@ -15,10 +16,10 @@ from pelican import signals, contents
 
 
 def article_title(content):
-    main_title = BeautifulSoup(content.title, 'html.parser').prettify().strip()
+    main_title = Markup(BeautifulSoup(content.title, 'html.parser').prettify().strip()).striptags()
     sub_title = ''
     if hasattr(content, 'subtitle'):
-        sub_title = BeautifulSoup(content.subtitle, 'html.parser').prettify().strip()
+        sub_title = Markup(BeautifulSoup(content.subtitle, 'html.parser').prettify().strip()).striptags()
     return quote(('%s %s' % (main_title, sub_title)).encode('utf-8'))
 
 
@@ -28,7 +29,7 @@ def article_url(content):
 
 
 def article_summary(content):
-    return quote(content.summary.encode('utf-8'))
+    return quote(Markup(content.summary).striptags().encode('utf-8'))
 
 
 def share_post(content):
